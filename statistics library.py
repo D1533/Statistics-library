@@ -102,6 +102,7 @@ def beta_abscissa(n1,n2,alpha):
         b += 0.00005
     
     return b
+
 def f_snedecor_abscissa(n1,n2, alpha):
     x = beta_abscissa(n1/2,n2/2,alpha)
     return n2*x/(n1*(1-x))
@@ -137,6 +138,34 @@ def normal_mean_confidence_interval(X,  alpha, standard_deviation = None):
         # Interval endpoints
         a = round(mean - normal_abscissa(alpha/2)*standard_deviation/n**(0.5), 4)
         b = round(mean + normal_abscissa(alpha/2)*standard_deviation/n**(0.5), 4)
+
+    return [a, b]
+
+def normal_mean_difference_confidence_interval(X, Y, alpha):
+    x = mean(X)
+    y = mean(Y)
+    s_x = variance(X)
+    s_y = variance(Y)
+    n_x = len(X)
+    n_y = len(Y)
+
+    S_p = sqrt( ((n_x - 1)*s_x + (n_y - 1)*s_y)/(n_x + n_y - 2) )
+    if n_x >= 30 and n_y >= 30:
+        a = (x - y) - normal_abscissa(alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
+        b = (x - y) + normal_abscissa(alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
+    else:
+        a = (x - y) - t_student_abscissa(n_x + n_y - 2, alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
+        b = (x - y) + t_student_abscissa(n_x + n_y - 2, alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
+    
+    return [a,b]
+
+def binomial_proportion_confidence_interval(X, alpha):
+    # X is a vector of 1's and 0's where 1 means the element satisfy the property studied (Bernoulli)
+    n = len(X)
+    p = sum(X)/n
+
+    a = (p - normal_abscissa(alpha/2)/sqrt(n)*sqrt(p*(1-p)))
+    b = (p + normal_abscissa(alpha/2)/sqrt(n)*sqrt(p*(1-p)))
 
     return [a, b]
 
@@ -239,4 +268,9 @@ def descriptive_statistics_summary(X):
         'Mode' : mode(X)
     }
 
+def covariance(X,Y):
+    XY = []
+    for i in range(len(X)):
+        XY.append(X[i]*Y[i])
 
+    return mean(XY)-mean(X)*mean(Y)
