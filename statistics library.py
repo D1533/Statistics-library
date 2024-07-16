@@ -11,7 +11,7 @@ def normal_pdf(x):
     return (2*math.pi)**(-0.5)*math.exp(-0.5*(x**2))
 
 def t_student_pdf(nu, x):
-    return math.gamma(0.5 * (nu + 1.0)) / math.gamma(0.5 * nu) / math.sqrt(nu * math.pi) * (1 + x**2/nu)**(-0.5*(nu + 1))
+    return math.gamma(0.5 * (nu + 1.0)) / math.gamma(0.5 * nu) / (nu * math.pi)**0.5 * (1 + x**2/nu)**(-0.5*(nu + 1))
 
 def chi_squared_pdf(n, x):
     return 1/(2**(n/2)*math.gamma(n/2))*x**(n/2-1)*math.exp(-x/2)
@@ -149,13 +149,13 @@ def normal_mean_difference_confidence_interval(X, Y, alpha):
     n_x = len(X)
     n_y = len(Y)
 
-    S_p = sqrt( ((n_x - 1)*s_x + (n_y - 1)*s_y)/(n_x + n_y - 2) )
+    S_p = ( ((n_x - 1)*s_x + (n_y - 1)*s_y)/(n_x + n_y - 2) )**0.5
     if n_x >= 30 and n_y >= 30:
-        a = (x - y) - normal_abscissa(alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
-        b = (x - y) + normal_abscissa(alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
+        a = (x - y) - normal_abscissa(alpha/2)*S_p*(1/n_x + 1/n_y)**0.5
+        b = (x - y) + normal_abscissa(alpha/2)*S_p*(1/n_x + 1/n_y)**0.5
     else:
-        a = (x - y) - t_student_abscissa(n_x + n_y - 2, alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
-        b = (x - y) + t_student_abscissa(n_x + n_y - 2, alpha/2)*S_p*sqrt(1/n_x + 1/n_y)
+        a = (x - y) - t_student_abscissa(n_x + n_y - 2, alpha/2)*S_p*(1/n_x + 1/n_y)**0.5
+        b = (x - y) + t_student_abscissa(n_x + n_y - 2, alpha/2)*S_p*(1/n_x + 1/n_y)**0.5
     
     return [a,b]
 
@@ -164,8 +164,8 @@ def binomial_proportion_confidence_interval(X, alpha):
     n = len(X)
     p = sum(X)/n
 
-    a = (p - normal_abscissa(alpha/2)/sqrt(n)*sqrt(p*(1-p)))
-    b = (p + normal_abscissa(alpha/2)/sqrt(n)*sqrt(p*(1-p)))
+    a = (p - normal_abscissa(alpha/2)/n**0.5*(p*(1-p))**0.5)
+    b = (p + normal_abscissa(alpha/2)/n**0.5*(p*(1-p))**0.5)
 
     return [a, b]
 
@@ -274,3 +274,6 @@ def covariance(X,Y):
         XY.append(X[i]*Y[i])
 
     return mean(XY)-mean(X)*mean(Y)
+
+def pearson_coeff(X,Y):
+    return covariance(X,Y)/( variance(X)**0.5*variance(Y)**0.5 )
