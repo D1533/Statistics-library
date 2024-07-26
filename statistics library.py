@@ -1,4 +1,5 @@
 import math
+import numpy as np # Necesary to compute some matrix multiplications and inverses
 
 ######################################################################################
 # Descriptive statistics
@@ -26,6 +27,9 @@ def percentile(X, k):
     N = len(X)
     n = math.ceil(k/100*(N-1))
     return sorted(X)[n]
+
+def IQR(X):
+    return percentile(X, 75) - percentile(X, 25)
 
 def median(X):
     return percentile(X, 50)
@@ -75,7 +79,6 @@ def pearson_coeff(X,Y):
     return covariance(X,Y)/( variance(X)**0.5*variance(Y)**0.5 )
 
 # Multivariate analysis
-
 def mean_vector(X):
     m = len(X[0])
     mu_vect = []
@@ -106,6 +109,10 @@ def correlation_matrix(X):
             Corr[i][j] = c
             Corr[j][i] = c
     return Corr
+
+def linear_regresion(X, y):
+    # w = (X'X)^{-1}X'y
+    return np.dot(np.linalg.inv(np.dot(np.transpose(X),X)), np.dot(np.transpose(X), y))
 
 ##################################################################################################
 # Common Probability distributions
@@ -210,8 +217,6 @@ def beta_abscissa(n1,n2,alpha):
 def f_snedecor_abscissa(n1,n2, alpha):
     x = beta_abscissa(n1/2,n2/2,alpha)
     return n2*x/(n1*(1-x))
-
-
 
 ###################################################################################################
 # Confidence intervals
