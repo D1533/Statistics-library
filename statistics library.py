@@ -74,7 +74,47 @@ def covariance(X,Y):
 def pearson_coeff(X,Y):
     return covariance(X,Y)/( variance(X)**0.5*variance(Y)**0.5 )
 
+# Multivariate analysis
 
+def mean_vector(X):
+    m = len(X[0])
+    mu_vect = []
+    for i in range(m):
+        mu_vect.append(mean([row[i] for row in X]))
+    return mu_vect
+
+def covariance_matrix(X):
+    m = len(X[0])
+    Cov = [[0 for i in range(m)] for j in range(m)]
+    for i in range(m):
+        for j in range(i,m):
+            x_1 = [row[i] for row in X]
+            x_2 = [row[j] for row in X]
+            c = covariance(x_1,x_2)
+            Cov[i][j] = c
+            Cov[j][i] = c
+    return Cov
+
+def correlation_matrix(X):
+    m = len(X[0])
+    Corr = [[0 for i in range(m)] for j in range(m)]
+    for i in range(m):
+        for j in range(i,m):
+            x_1 = [row[i] for row in X]
+            x_2 = [row[j] for row in X]
+            c = pearson_coeff(x_1,x_2)
+            Corr[i][j] = c
+            Corr[j][i] = c
+    return Corr
+    
+data_matrix = [
+    [4.0, 2.0, 0.6],
+    [4.2, 2.1, 0.59],
+    [3.9, 2.0, 0.58],
+    [4.3, 2.1, 0.62],
+    [4.1, 2.2, 0.63]
+]
+print(mean_vector(data_matrix))
 ##################################################################################################
 # Common Probability distributions
 ##################################################################################################
@@ -188,7 +228,7 @@ def f_snedecor_abscissa(n1,n2, alpha):
 # Returns the interval [a,b] such that the probability of the mean of the data set X be in [a,b] is (1 - alpha)
 def normal_mean_confidence_interval(X,  alpha, standard_deviation = None):
     # Computes the mean of the data set X
-    mean = mean(X)
+    mu = mean(X)
 
     # The user supose that the data follows a Normal distribution
     if standard_deviation is None:
@@ -196,14 +236,14 @@ def normal_mean_confidence_interval(X,  alpha, standard_deviation = None):
         S = sample_variance(X)
         # Interval
         t = t_student_abscissa(len(X)-1,alpha/2)
-        a = mean - t*S/n**(0.5)
-        b = mean + t*S/n**(0.5)
+        a = mu - t*S/n**(0.5)
+        b = mu + t*S/n**(0.5)
     # The user doesn't supose that the data follows a Normal distribution (this works better for large samples with n > 30)
     else:
         # Interval endpoints
         z = normal_abscissa(alpha/2)
-        a = mean - z*standard_deviation/n**(0.5)
-        b = mean + z*standard_deviation/n**(0.5)
+        a = mu - z*standard_deviation/n**(0.5)
+        b = mu + z*standard_deviation/n**(0.5)
 
     return [a, b]
 
@@ -239,21 +279,19 @@ def binomial_proportion_confidence_interval(X, alpha):
     return [a, b]
 
 def poisson_mean_confidence_interval(X, alpha):
-    mean = mean(X)
+    mu = mean(X)
 
     # Interval endpoints
     z = normal_abscissa(alpha/2)
-    a = mean - z*(mean/n)**0.5
-    b = mean - z*(mean/n)**0.5
+    a = mu - z*(mu/n)**0.5
+    b = mu - z*(mu/n)**0.5
 
     return [a,b]
 
 def normal_variance_confidence_interval(X, alpha, mean=None):
     n = len(X)
     if mean is None:
-        mean = mean(X)
-        for i in range(n):
-            mean += X[i]/n
+        mu = mean(X)
         S = sample_variance(X)
     
         a = (n-1)*S/(chi_squared_abscissa(n-1, alpha/2))
@@ -262,7 +300,7 @@ def normal_variance_confidence_interval(X, alpha, mean=None):
         return [a, b]
     k = 0
     for i in range(n):
-        k += (X[i] - mean)**2
+        k += (X[i] - mu)**2
     
     a = k / chi_squared_abscissa(n,alpha/2)
     b = k / chi_squared_abscissa(n, 1 - alpha/2)
