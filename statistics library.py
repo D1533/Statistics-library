@@ -57,11 +57,11 @@ def coefficient_of_variation(X):
 def descriptive_statistics_summary(X):
     return {
         'Mean' : mean(X),
-        'Variance' : variance(X),
-        'Standard Deviation': variance(X)**0.5,
+        'Variance' : sample_variance(X),
+        'Standard Deviation': sample_variance(X)**0.5,
         'Coefficient of Variation': coefficient_of_variation(X),
-        'Skewness' : central_moment(X,3),
-        'Kurtosis' : central_moment(X,4),
+        'Skewness' : central_moment(X,3)/sample_variance(X)**1.5,
+        'Kurtosis' : central_moment(X,4)/sample_variance(X)**2,
         '0.25 Percentile' : percentile(X, 25),
         'Median' : median(X),
         '0.75 Percentile' : percentile(X,75),
